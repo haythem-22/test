@@ -2,6 +2,8 @@
 calculateur d'ammortissement en react et express
 steps to run project localy 
 
+Steps to run the project localy 
+
 cd test
 
 cd frontend 
