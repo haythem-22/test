@@ -2,18 +2,18 @@
 calculateur d'ammortissement en react et express
 steps to run project localy 
 
-Steps to run the project localy 
+Steps to run the project localy:
 
-cd test
+-cd test
 
-cd frontend 
+-cd frontend 
 
-npm install 
+-npm install 
 
-npm start 
+-npm start 
 
-cd server
+-cd server
 
-npm install 
+-npm install 
 
-node server.js or npm run dev
+-node server.js or npm run dev
