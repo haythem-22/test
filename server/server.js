@@ -5,7 +5,6 @@ const app = express();
 const port = 3001;
 
 app.use(cors());
-
 app.use(bodyParser.json());
 
 app.post('/calculate-amortization', (req, res) => {
@@ -14,29 +13,37 @@ app.post('/calculate-amortization', (req, res) => {
     downPayment,
     loanDuration,
     annualInterestRate,
+    manualFraisAchat,
+    fraisAchat,
   } = req.body;
-
+   
   // Calculate Frais d'achat
-  const fraisAchat = purchaseAmount > 50000 ? purchaseAmount * 0.10 : 0;
+  const calculatedFraisAchat = manualFraisAchat ? fraisAchat : (purchaseAmount * 0.10);
+  console.log(calculatedFraisAchat)
+
+console.log(typeof purchaseAmount); 
+console.log(typeof fraisAchat); 
+console.log(typeof downPayment); 
 
   // Calculate Montant à emprunter Brut
-  const montantEmprunterBrut = purchaseAmount *1.1 - downPayment;
-console.log('montantEmprunterBrut',montantEmprunterBrut)
+  const montantEmprunterBrut = (parseInt(purchaseAmount, 10) + parseInt(calculatedFraisAchat,10)) - parseInt(downPayment, 10);
+  console.log('montantEmprunterBrut', montantEmprunterBrut);
+
   // Calculate Montant à emprunter Net
   const fraisHypotheque = montantEmprunterBrut * 0.02;
   const montantEmprunterNet = (montantEmprunterBrut + fraisHypotheque).toFixed(2);
   console.log('Montant à emprunter Net:', montantEmprunterNet);
-  // Convert annual interest rate to monthly 
-  const monthlyInterestRate = (((1 + (annualInterestRate/100)) ** ((1 / 12))-1)*100).toFixed(3);
+  
+  // Convert annual interest rate to monthly
+  const monthlyInterestRate = (((1 + (annualInterestRate / 100)) ** (1 / 12) - 1) * 100).toFixed(3);
   console.log('Monthly Interest Rate:', monthlyInterestRate);
 
   // Calculate the correct monthly payment
-const r = monthlyInterestRate / 100; 
-const n = loanDuration;
-const P = montantEmprunterNet;
+  const r = monthlyInterestRate / 100;
+  const n = loanDuration;
+  const P = montantEmprunterNet;
 
-const monthlyPayment = ((P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)).toFixed(2);
-
+  const monthlyPayment = ((P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)).toFixed(2);
   console.log('Monthly Payment:', monthlyPayment);
 
   // Generate the amortization table
@@ -44,8 +51,8 @@ const monthlyPayment = ((P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1))
   let remainingBalance = montantEmprunterNet;
 
   for (let period = 1; period <= loanDuration; period++) {
-    const startingBalance = remainingBalance
-    const interest = (remainingBalance * (monthlyInterestRate/100)).toFixed(2);
+    const startingBalance = remainingBalance;
+    const interest = (remainingBalance * (monthlyInterestRate / 100)).toFixed(2);
     const principal = (monthlyPayment - interest).toFixed(2);
     remainingBalance = (remainingBalance - principal).toFixed(2);
 
@@ -60,14 +67,14 @@ const monthlyPayment = ((P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1))
   }
 
   res.json({
-    fraisAchat,
+    fraisAchat: calculatedFraisAchat,
     montantEmprunterBrut,
     montantEmprunterNet,
     monthlyPayment,
-    amortizationData: amortizationTable, 
+    amortizationData: amortizationTable,
   });
-  
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

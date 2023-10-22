@@ -10,6 +10,8 @@ function AmortizationCalculator() {
   const [amortizationData, setAmortizationData] = useState([]);
   const [montantEmprunterNet, setMontantEmprunterNet] = useState(0);
   const [monthlyPayment, setMonthlyPayment] = useState(0);
+  const [fraisAchat, setFraisAchat] = useState(0);
+  const [manualMode, setManualMode] = useState(false);
 
   const handleCalculateAmortization = () => {
     if (
@@ -25,14 +27,16 @@ function AmortizationCalculator() {
       alert('Please enter valid numeric values greater than 0 for all inputs.');
       return;
     }
-  
+
     const data = {
       purchaseAmount,
       downPayment,
       loanDuration,
       annualInterestRate,
+      manualFraisAchat: manualMode,
+      fraisAchat: manualMode ? fraisAchat : 0,
     };
-  
+
     axios
       .post('http://localhost:3001/calculate-amortization', data)
       .then((response) => {
@@ -65,7 +69,7 @@ function AmortizationCalculator() {
         />
       </div>
       <div className="form-item">
-        <label>Durée(mois):</label>
+        <label>Durée (mois):</label>
         <input
           type="number"
           value={loanDuration}
@@ -80,13 +84,26 @@ function AmortizationCalculator() {
           onChange={(e) => setAnnualInterestRate(e.target.value)}
         />
       </div>
+      <div className="form-item">
+        <label>Frais d'achat:</label>
+        <input
+          type="number"
+          value={fraisAchat}
+          onChange={(e) => setFraisAchat(e.target.value)}
+          disabled={!manualMode}
+        />
+        <label>Manual Mode:</label>
+        <input
+          type="checkbox"
+          checked={manualMode}
+          onChange={() => setManualMode(!manualMode)}
+        />
+      </div>
       <button onClick={handleCalculateAmortization}>Calculate Amortization</button>
-
-
       <div>
-  <p>Montant à Emprunter Net: {montantEmprunterNet}</p>
-  <p>Monthly Payment: {monthlyPayment}</p>
-</div>
+        <p>Montant à Emprunter Net: {montantEmprunterNet}</p>
+        <p>Monthly Payment: {monthlyPayment}</p>
+      </div>
       {amortizationData.length > 0 && (
         <div className="amortization-table-container">
           <h2>Amortization Schedule</h2>
