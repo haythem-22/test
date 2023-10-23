@@ -38,7 +38,7 @@ console.log(typeof downPayment);
   const monthlyInterestRate = (((1 + (annualInterestRate / 100)) ** (1 / 12) - 1) * 100).toFixed(3);
   console.log('Monthly Interest Rate:', monthlyInterestRate);
 
-  // Calculate the correct monthly payment
+  // Calculate monthly payment
   const r = monthlyInterestRate / 100;
   const n = loanDuration;
   const P = montantEmprunterNet;
